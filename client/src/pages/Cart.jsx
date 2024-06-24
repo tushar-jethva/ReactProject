@@ -153,8 +153,6 @@ const Cart = () => {
     const token = localStorage.getItem("krist-app-token");
     const data = await getCart(token);
     setProducts(data);
-  calculateSubtotal()
-
     setLoading(false);
   };
 
@@ -177,36 +175,24 @@ const Cart = () => {
 
   const removeCart = async (id, quantity, type) => {
     const token = localStorage.getItem("krist-app-token");
-    let qnt = quantity > 0 ? 1 : null;
-    if (type === "full") qnt = null;
-    await deleteFromCart(token, {
-      productId: id,
-      quantity: qnt,
-    })
-      .then((res) => {
-        setReload(!reload);
-      })
-      .catch((err) => {
-        setReload(!reload);
-        dispatch(
-          openSnackbar({
-            message: err.message,
-            severity: "error",
-          })
-        );
-      });
+    await deleteFromCart({
+      id,
+    });
   };
 
   const calculateSubtotal = () => {
     // console.log(products); // This will log the products array to the console
     products.map((product) => {
-  const discountedPrice =  product.product.price -  (product.product.price * product.product.discount) / 100.00;
-       setTotal(total + product.quantity_product * discountedPrice);
+      const discountedPrice =
+        product.product.price -
+        (product.product.price * product.product.discount) / 100.0;
+      setTotal(total + product.quantity_product * discountedPrice);
     });
   };
 
   useEffect(() => {
     getProducts();
+    calculateSubtotal();
   }, [reload]);
 
   const convertAddressToString = (addressObj) => {
@@ -287,7 +273,6 @@ const Cart = () => {
                   <TableItem></TableItem>
                 </Table>
                 {products?.map((item) => (
-                  
                   <Table>
                     <TableItem flex>
                       <Product>
@@ -298,9 +283,13 @@ const Cart = () => {
                           <ProSize>Size: Xl</ProSize>
                         </Details>
                       </Product>
-                    </TableItem> 
-                    
-                    <TableItem>${item.product.price -  (item.product.price * item.product.discount) / 100.00}</TableItem>
+                    </TableItem>
+
+                    <TableItem>
+                      $
+                      {item.product.price -
+                        (item.product.price * item.product.discount) / 100.0}
+                    </TableItem>
                     <TableItem>
                       <Counter>
                         <div
@@ -320,35 +309,35 @@ const Cart = () => {
                             cursor: "pointer",
                             flex: 1,
                           }}
-                          onClick={() => addCart(item?.product?._id)}
-                        >
-                          +
-                        </div>
+                          onClick={() =>
+                            addCart(
+                              item?.product?._id,
+                              item.quantity_product + 1
+                            )
+                          }
+                        ></div>
                       </Counter>
                     </TableItem>
                     <TableItem>
                       {" "}
-                      ${(item.quantity_product * (item.product.price -  (item.product.price * item.product.discount) / 100.00)).toFixed(2)}
+                      $
+                      {(
+                        item.quantity_product *
+                        (item.product.price -
+                          (item.product.price * item.product.discount) / 100.0)
+                      ).toFixed(2)}
                     </TableItem>
                     <TableItem>
                       <DeleteOutline
                         sx={{ color: "red" }}
-                        onClick={() =>
-                          removeCart(
-                            item?.product?._id,
-                            item?.quantity_product - 1,
-                            "full"
-                          )
-                        }
+                        onClick={() => removeCart(item?.product?._id)}
                       />
                     </TableItem>
                   </Table>
                 ))}
               </Left>
               <Right>
-                <Subtotal>
-                  Subtotal : ${total}
-                </Subtotal>
+                <Subtotal>Subtotal : ${total}</Subtotal>
                 <Delivery>
                   Delivery Details:
                   <div>

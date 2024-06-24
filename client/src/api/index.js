@@ -31,18 +31,17 @@ export const getCart = async (token) => {
 export const addToCart = async (token, data) => {
   await API.post(`/addCartProduct`, data, {
     headers: { Authorization: `Bearer ${token}` },
-  });
+  }); 
   return "Done";
 }
- 
 
-export const deleteFromCart = async (token, data) =>
-  await API.patch(`/user/cart/`, data, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export const deleteFromCart = async (id) => {
+  console.log(id)
+  const res = await API.get(`/deleteFromCart?product_id=${id}`);
+  console.log(res); 
+}
 
 //Favourites
-
 export const getFavourite = async (token) =>
   await API.get(`/user/favorite`, {
     headers: { Authorization: `Bearer ${token}` },

@@ -82,6 +82,8 @@ cartRouter.get('/api/getAllCustomerCartProducts',async(req,res)=>{
 
 cartRouter.get('/api/deleteFromCart',async(req,res)=>{
     try{
+        console.log("Hello",req.query.product_id,"Hello")
+
         await CartModel.findOneAndDelete({"product_id":req.query.product_id});
         res.json({"Delete":"Deleted"});
     }
